@@ -1,0 +1,3 @@
+[submodule "bstld"]
+	path = bstld
+	url = https://github.com/e-sha/bstld
