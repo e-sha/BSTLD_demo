@@ -37,6 +37,8 @@ COPY ssd_mobilenet_v1.config .
 RUN wget http://download.tensorflow.org/models/object_detection/ssd_mobilenet_v1_coco_2017_11_17.tar.gz && \
   tar zxvf ssd_mobilenet_v1_coco_2017_11_17.tar.gz
 
+COPY models models/
+
 COPY demo.ipynb .
 
 ENTRYPOINT jupyter notebook --no-browser --ip=0.0.0.0 --allow-root --ipc=host --NotebookApp.token='' --NotebookApp.password=''
