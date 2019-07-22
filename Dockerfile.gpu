@@ -1,0 +1,42 @@
+From nvidia/cuda:10.0-cudnn7-devel-ubuntu18.04
+LABEL maintainer=eshalnov@graphics.cs.msu.ru
+
+ENV TZ=Europe/Moscow
+RUN ln -snf /usr/share/zoneinfo/%TZ /etc/localtime && echo $TZ > /etc/timezone
+
+WORKDIR /root
+
+ARG DEBIAN_FRONTEND=noninteractive
+
+RUN apt-get update && \
+  apt-get install -y \
+    python3-pip \
+    python3-dev \
+    git \
+    protobuf-compiler \
+    wget \
+    python3-opencv
+
+COPY requirements.txt .
+
+RUN pip3 install --user tensorflow-gpu && \
+  pip3 install --user -r requirements.txt && \
+  rm requirements.txt
+
+RUN git clone http://github.com/tensorflow/models && \
+  cd models/research && protoc object_detection/protos/*.proto --python_out=. && \
+  echo PYTHONPATH=`pwd`:`pwd`/slim:$PYTHONPATH
+
+ENV MODELDIR=/root/models/research
+ENV PYTHONPATH "$MODELDIR:$MODELDIR/slim:$PYTHONPATH"
+ENV PATH "/root/.local/bin:$PATH"
+
+RUN git clone https://github.com/e-sha/bstld
+
+COPY ssd_mobilenet_v1.config .
+RUN wget http://download.tensorflow.org/models/object_detection/ssd_mobilenet_v1_coco_2017_11_17.tar.gz && \
+  tar zxvf ssd_mobilenet_v1_coco_2017_11_17.tar.gz
+
+COPY demo.ipynb .
+
+ENTRYPOINT jupyter notebook --no-browser --ip=0.0.0.0 --allow-root --ipc=host --NotebookApp.token='' --NotebookApp.password=''
