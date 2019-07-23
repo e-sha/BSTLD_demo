@@ -31,7 +31,10 @@ ENV MODELDIR=/root/models/research
 ENV PYTHONPATH "$MODELDIR:$MODELDIR/slim:$PYTHONPATH"
 ENV PATH "/root/.local/bin:$PATH"
 
-RUN git clone https://github.com/e-sha/bstld
+RUN git clone https://github.com/e-sha/bstld && \
+  cd bstld && \
+  git checkout v1.0.2 && \
+  cd ..
 
 COPY ssd_mobilenet_v1.config .
 RUN wget http://download.tensorflow.org/models/object_detection/ssd_mobilenet_v1_coco_2017_11_17.tar.gz && \
